@@ -38,7 +38,7 @@ mix escript.build
 
 ```sh
 cd goring
-go build -w goring
+go build -o goring
 ```
 
 * Run
