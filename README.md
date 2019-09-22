@@ -37,8 +37,8 @@ mix escript.build
 * Build
 
 ```sh
-cd golang
-go build -w ring
+cd goring
+go build -w goring
 ```
 
 * Run
