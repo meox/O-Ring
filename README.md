@@ -19,16 +19,29 @@ on the Internet!
 
 ## Elixir
 
+* Build
+
+```sh
+cd exring
+mix escript.build
+```
+
+* Run
+
+```sh
+./exring 200000 30
+```
+
 ## Go
 
-### Build
+* Build
 
 ```sh
 cd golang
 go build -w ring
 ```
 
-### Run
+* Run
 
 ```sh
 ./ring 200000 30
