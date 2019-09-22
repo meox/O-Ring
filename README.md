@@ -43,5 +43,4 @@ go build -w ring
 ## Authors
 
 - Federico Bertolucci
-- Elia Mazzuoli
 - Gian Lorenzo Meocci (`glmeocci @ gmail.com`)
