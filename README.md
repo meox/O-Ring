@@ -17,6 +17,8 @@ on the Internet!
 
 ## Erlang
 
+## Elixir
+
 ## Go
 
 ### Build
@@ -32,8 +34,14 @@ go build -w ring
 ./ring 200000 30
 ```
 
+## Haskell
+
+## Scala
+
+## Benchmark
+
 ## Authors
 
 - Federico Bertolucci
 - Elia Mazzuoli
-- Gian Lorenzo Meocci
+- Gian Lorenzo Meocci (glmeocci @ gmail.com)
