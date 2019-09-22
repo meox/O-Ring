@@ -1,8 +1,8 @@
 # Ring
 
-Ring Erlang exercize implemented in several languages.
+Ring Erlang exercise implemented in several languages.
 
-## Exericize
+## Exercise
 
 Taken from "Programming Erlang", second edition:
 
@@ -43,5 +43,4 @@ go build -w ring
 ## Authors
 
 - Federico Bertolucci
-- Elia Mazzuoli
-- Gian Lorenzo Meocci (glmeocci @ gmail.com)
+- Gian Lorenzo Meocci (`glmeocci @ gmail.com`)
