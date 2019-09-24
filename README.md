@@ -4,7 +4,7 @@ Ring Erlang exercise implemented in several languages.
 
 ## Exercise
 
-Taken from "Programming Erlang", second edition:
+Taken from "Programming Erlang", second edition (by Joe Armstrong):
 
 ```text
 Write a ring benchmark. Create N processes in a ring. Send a message
