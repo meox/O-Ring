@@ -6,6 +6,7 @@ The Ring exercise in Erlang, without OTP.
 ---
 
 Compile the source code: `erlc ring.erl`
+
 Run the script: `./ring N M`
 with:
   -  `N`: the number of processes in the ring
