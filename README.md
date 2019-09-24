@@ -15,6 +15,22 @@ familiar with. Compare the results. Write a blog, and publish the results
 on the Internet!
 ```
 
+## Guidelines
+To partecipate to the benchmark, you must adopt on the following guidelines:
+  *  every implementation shall expose an executable file (bash script or program) named `ring`
+  *  every implementation shall agree on the following API when `ring` is invoked: `./ring NumberOfNodes NumberOfTrips` where:
+     -  `NumberOfNodes`: the number of processes/threads/nodes in the ring, `N` in the description above
+     -  `NumberOfTrips`: the number of times a message is passed in the ring, `M` in the description above
+     -  returned value of the script should be `0` if ok
+     -  in case of errors, nothing shall be written on stdout (you can write on stderr), and error code shall be different than `0`
+  * every implementation shall measure the time interval `T` in milliseconds between the instant the first message is sent and the instant the last one is received 
+  * every implementation shall write to stdout a single number, `T`, described above
+  * every implementation shall be provided in a separated folder with a significant name
+  * every implementation shall provide a `README.md` file with (at least) the following sections:
+     -  `Build`: instructions on how to build; after a successful build, a `ring` executable should be present in a build directory
+     -  `Description`: a brief description of the implementation
+  * every implementation has complete freedom on all other aspects not specified above
+
 ## Erlang
 
 ## Elixir
