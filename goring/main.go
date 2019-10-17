@@ -25,24 +25,22 @@ func main() {
 		fmt.Println("cannot parse number of trips")
 	}
 
-	//fmt.Println("Creating Ring")
 	t0 := time.Now()
 	s, e := createRing(n)
-	//t1 := time.Now()
-	//fmt.Printf("Ring created in: %d ms\n", t1.Sub(t0).Milliseconds())
+	t1 := time.Now()
 
 	for i := 0; i < m; i++ {
 		s <- i
 		_ = <-e
 	}
-	//t2 := time.Now()
 
-	//fmt.Printf(
-	//	"runned in: %d ms, tot: %dms\n",
-	//	t2.Sub(t1).Milliseconds(),
-	//	t2.Sub(t0).Milliseconds(),
-	//)
-	fmt.Printf("%d\n", time.Since(t0).Milliseconds())
+	fmt.Printf(
+		"%d %d %d %d\n",
+		t1.Sub(t0).Milliseconds(),
+		time.Since(t1).Milliseconds(),
+		n,
+		m,
+	)
 }
 
 func createRing(n int) (chanT, chanT) {
