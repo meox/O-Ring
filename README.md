@@ -33,6 +33,19 @@ To partecipate to the benchmark, you must adopt on the following guidelines:
 
 ## Erlang
 
+* Build
+
+```sh
+cd erling
+erlc ring.erl
+```
+
+* Run
+
+```sh
+./ring 200000 30
+```
+
 ## Elixir
 
 * Build
@@ -54,7 +67,7 @@ mix escript.build
 
 ```sh
 cd goring
-go build -o goring
+make all
 ```
 
 * Run
