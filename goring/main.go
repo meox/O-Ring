@@ -11,7 +11,7 @@ type chanT chan int
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Println("./ring N:<number of process> M:<iteration>")
+		fmt.Println("./ring N:<number of process> M:<trips>")
 		os.Exit(1)
 	}
 
@@ -22,7 +22,7 @@ func main() {
 
 	m, err := strconv.Atoi(os.Args[2])
 	if err != nil {
-		fmt.Println("cannot parse number of iterations")
+		fmt.Println("cannot parse number of trips")
 	}
 
 	fmt.Println("Creating Ring")
@@ -33,7 +33,7 @@ func main() {
 
 	for i := 0; i < m; i++ {
 		s <- i
-		_ = <- e
+		_ = <-e
 	}
 	t2 := time.Now()
 
@@ -49,7 +49,7 @@ func createRing(n int) (chanT, chanT) {
 
 	node := func(src, dst chanT) {
 		for {
-			msg := <- src
+			msg := <-src
 			dst <- msg
 		}
 	}
