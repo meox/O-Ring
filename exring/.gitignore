@@ -24,3 +24,5 @@ exring-*.tar
 
 .elixir_ls
 
+ring
+exring

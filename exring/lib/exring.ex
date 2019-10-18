@@ -6,12 +6,11 @@ defmodule ExRing do
   def start(n, m) do
     t0 = Time.utc_now()
 
-    n
-    |> create_ring()
-    |> run(m)
+    {creation_time, ring} = create_ring(n)
+    run(ring, m)
 
     t1 = Time.utc_now()
-    IO.puts("Total: #{Time.diff(t1, t0, :millisecond)}ms")
+    IO.puts("#{creation_time} #{Time.diff(t1, t0, :millisecond)} #{n} #{m}")
   end
 
   def run(_ring, 0), do: 0
@@ -23,7 +22,7 @@ defmodule ExRing do
     run(ring, step - 1)
   end
 
-  @spec create_ring(number) :: pid
+  @spec create_ring(number) :: {number, pid}
   def create_ring(n) do
     t0 = Time.utc_now()
 
@@ -33,8 +32,7 @@ defmodule ExRing do
       |> chain(n - 1)
 
     t1 = Time.utc_now()
-    IO.puts("Ring time: #{Time.diff(t1, t0, :millisecond)}ms")
-    ring
+    {Time.diff(t1, t0, :millisecond), ring}
   end
 
 
