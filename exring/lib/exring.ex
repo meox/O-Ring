@@ -26,25 +26,34 @@ defmodule ExRing do
   @spec create_ring(number) :: pid
   def create_ring(n) do
     t0 = Time.utc_now()
-    node = node_up(self())
-    first_node = chain(node, n - 1)
+
+    ring =
+      self()
+      |> node_spawn()
+      |> chain(n - 1)
+
     t1 = Time.utc_now()
     IO.puts("Ring time: #{Time.diff(t1, t0, :millisecond)}ms")
-    first_node
+    ring
   end
+
+
+  #******************* HELPERS *******************
 
   @spec chain(pid, number) :: pid
   defp chain(parent, 0), do: parent
   defp chain(parent, n) do
     parent
-    |> node_up()
+    |> node_spawn()
     |> chain(n - 1)
   end
 
-  defp node_up(dst) do
+  defp node_spawn(dst) do
     spawn(fn -> process_node(dst) end)
   end
 
+  # process node function:
+  # take a message and send it to destination node
   defp process_node(dst) do
     receive do
       msg ->
