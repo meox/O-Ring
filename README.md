@@ -32,6 +32,20 @@ To partecipate to the benchmark, you must adopt on the following guidelines:
      -  `Description`: a brief description of the implementation
   * every implementation has complete freedom on all other aspects not specified above
 
+## Example Output
+
+```
+> ./ring 200000 30
+465 2990 200000 30
+```
+
+where:
+
+- `465` is the time in ms to setup the ring
+- `2990` is the time in ms from the first message to the last one
+- `200000` is the number of nodes in the ring
+- `30` is the number of trips (how many times we sent a message in the ring)
+
 ## Erlang
 
 * Build
