@@ -1,4 +1,4 @@
-# Exring
+# ExRing
 
 **Elixir implementation of Ring Exercise**
 
