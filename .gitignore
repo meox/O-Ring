@@ -1,2 +1,7 @@
 .idea/
 .directory
+
+haskring/.stack-work/
+haskring/stack.yaml.lock
+
+ring
