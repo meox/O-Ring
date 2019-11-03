@@ -26,7 +26,7 @@ actor Ring
 actor Main
   var _ring_size: U32 = 3
   var _ring_count: U32 = 1
-  var _pass: USize = 10
+  var _trip: USize = 10
 
   var _env: Env
 
@@ -52,38 +52,33 @@ actor Main
       match option
       | "--size" =>
         _ring_size = value.u32()?
-      | "--count" =>
-        _ring_count = value.u32()?
-      | "--pass" =>
-        _pass = value.usize()?
+      | "--trip" =>
+        _trip = value.usize()?
       else
         error
       end
     end
 
   fun setup_ring() =>
-    for j in Range[U32](0, _ring_count) do
-      let first = Ring(1, _env)
-      var next = first
+    let first = Ring(1, _env)
+    var next = first
 
-      for k in Range[U32](0, _ring_size - 1) do
-        let current = Ring(_ring_size - k, _env, next)
-        next = current
-      end
+    for k in Range[U32](0, _ring_size - 1) do
+      let current = Ring(_ring_size - k, _env, next)
+      next = current
+    end
 
-      first.set(next)
+    first.set(next)
 
-      if _pass > 0 then
-        first.pass(_pass)
-      end
+    if _trip > 0 then
+      first.pass(_trip)
     end
 
   fun usage() =>
     _env.out.print(
       """
-      rings OPTIONS
+      ring OPTIONS
         --size N number of actors in each ring
-        --count N number of rings
-        --pass N number of messages to pass around each ring
+        --trip N number of messages to pass around each ring
       """
       )
