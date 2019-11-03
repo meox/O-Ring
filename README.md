@@ -96,7 +96,7 @@ make all
 * Build
 
 ```sh
-cd goring
+cd haskring
 make all
 ```
 
