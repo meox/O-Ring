@@ -9,19 +9,21 @@ main([Nx, Mx]) ->
 
 
 start(N, M) ->
+    StartRing = erlang:monotonic_time(),
     Head = prepareFirst(N),
     buildRing(N),
     Head ! { rollcall, N, self() },
     receive 
-	allNodesUp -> void
+	allNodesUp -> StopRing = erlang:monotonic_time()
     end,
     Start = erlang:monotonic_time(),
     Head ! N*M,
     receive
 	done -> Stop = erlang:monotonic_time()
     end,
+    RingCreation = erlang:convert_time_unit(StopRing-StartRing, native, millisecond),
     ElapsedTime = erlang:convert_time_unit(Stop-Start, native, millisecond),
-    io:format("~p ~p ~p~n", [ElapsedTime, N, M]).
+    io:format("~p ~p ~p ~p~n", [RingCreation, ElapsedTime, N, M]).
 
 
 prepareFirst(N) ->
