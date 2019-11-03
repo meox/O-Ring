@@ -93,6 +93,19 @@ make all
 
 ## Haskell
 
+* Build
+
+```sh
+cd goring
+make all
+```
+
+* Run
+
+```sh
+./ring 200000 30
+```
+
 ## Scala
 
 ## Benchmark
