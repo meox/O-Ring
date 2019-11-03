@@ -5,8 +5,6 @@
 
 module Main (module Main) where
 
--- import System.Environment
-
 import qualified Paths_HaskRing as HR
 
 import Options
