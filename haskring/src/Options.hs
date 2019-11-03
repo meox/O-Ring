@@ -14,9 +14,10 @@ import Data.Semigroup ((<>), Semigroup(..))
 
 data Options = Options
     {
-      processes       :: Int
+      nodes           :: Int
     , trips           :: Int
     , version         :: Bool
+    , args            :: [String]
     } deriving (Show)
 
 
@@ -26,15 +27,16 @@ parseOptions = do
             ( long "version"
            <> short 'V'
            <> help "Print version")
-    processes <- option auto 
-            ( long "processes"
+    nodes <- option auto
+            ( long "nodes"
            <> short 'p'
            <> value 1000
-           <> help "Specify the number of processes")
-    trips <- option auto 
-            ( long "trip"
+           <> help "Specify the number of nodes")
+    trips <- option auto
+            ( long "trips"
            <> short 't'
            <> value 10
            <> help "Specify the number of trips")
+    args <- many (strArgument (help "N<nodes> M<trips>"))
     return Options{..}
 

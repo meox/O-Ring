@@ -19,7 +19,6 @@ executable haskring
                        filepath,
                        optparse-applicative,
                        time,
-                       vector,
-                       ghc-prim
+                       vector
   ghc-options:         -O3 -Wall 
 
