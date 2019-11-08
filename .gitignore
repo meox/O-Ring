@@ -1,7 +1,10 @@
 .idea/
 .directory
+**/tags
 
 haskring/.stack-work/
 haskring/stack.yaml.lock
+haskring/.ghc.environment*
+haskring/dist-newstyle
 
 ring

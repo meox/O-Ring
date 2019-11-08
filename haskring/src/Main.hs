@@ -1,9 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE MultiWayIf #-}
 
-module Main (module Main) where
+module Main where
 
 import qualified Paths_HaskRing as HR
 
@@ -12,12 +11,36 @@ import Options.Applicative
 import Control.Concurrent.Chan 
 import Control.Concurrent.MVar
 
-import Control.Monad (forever, forM_)
-import Control.Concurrent (forkIO)
+import Control.Monad
+import Control.Concurrent
 import Data.Version (showVersion)
 import Data.Time.Clock 
 import qualified Data.Vector as V
-import Data.Vector ((!))
+
+data ThreadContext = ThreadContext {
+      threadIndex :: {-# UNPACK #-} !Int
+    -- ^ The index of this thread in the ring. The parent index can be 
+    -- trivially calculated.
+    , totalNodes :: {-# UNPACK #-} !Int
+    -- ^ The total nodes in the ring.
+    , totalTrips :: {-# UNPACK #-} !Int
+    -- ^ The number of times each message needs to be passed around.
+    , mailbox :: Chan ()
+    -- ^ The mailbox for this thread.
+    }
+
+newtype Ring = Ring { getRing :: V.Vector ThreadContext }
+
+neighbourIndex :: ThreadContext -> Int
+neighbourIndex ThreadContext{..}
+  | threadIndex == totalNodes - 1 = 0
+  | otherwise = succ threadIndex
+{-# INLINE neighbourIndex #-}
+
+sendMessage :: Ring -> Int -> IO ()
+sendMessage (Ring ring) threadIndex =
+    writeChan (mailbox $ ring V.! threadIndex) ()
+{-# INLINE sendMessage #-}
 
 main :: IO ()
 main = updateOptions <$> execParser opts >>= \opt@Options{..} -> if | version   -> putStrLn $ showVersion HR.version 
@@ -27,15 +50,27 @@ main = updateOptions <$> execParser opts >>= \opt@Options{..} -> if | version   
                       (fullDesc <> header "haskring!")
 
 mainRun :: Options -> IO ()
-mainRun Options{..} = do
-  ta <- getCurrentTime 
-  (s, e) <- createRing nodes 
-  tb <- getCurrentTime
-  forM_ [1 .. trips] $ \i -> writeChan s i >> readChan e
-  tc <- getCurrentTime
+mainRun opts@Options{..} = do
+  setupStarted <- getCurrentTime 
+  ring <- newRing opts
+  setupEnded <- getCurrentTime
 
-  let t0 :: Int = round (1000 * (tb `diffUTCTime` ta))
-  let t1 :: Int = round (1000 * (tc `diffUTCTime` tb))
+  -- We can already deliver the message to threadIndex = 0, as the mailbox
+  -- already exist.
+  forM_ [1 .. trips] $ \_ -> sendMessage ring 0
+
+  let lastThread = getRing ring V.! (nodes - 1)
+  lastThreadMailbox <- dupChan (mailbox lastThread)
+
+  forM_ (getRing ring) $ \ctx -> spinUpThread ctx ring
+
+  -- Wait for messages on the last element of the ring.
+  forM_ [1 .. trips] $ \_ -> readChan lastThreadMailbox
+
+  messageExchangeEnded <- getCurrentTime
+
+  let t0 :: Int = round (1000 * (setupEnded `diffUTCTime` setupStarted))
+  let t1 :: Int = round (1000 * (messageExchangeEnded `diffUTCTime` setupEnded))
 
   putStrLn $ show t0 <> " " <> show t1 <> " " <> show nodes <> " " <> show trips
 
@@ -59,35 +94,25 @@ node' s d = do
   writeChan d msg 
   node' s d
 
+-- | Creates a new 'Ring' from some 'Options'.
+newRing :: Options -> IO Ring
+newRing Options{..} = Ring . V.fromList <$> (
+    forM [0 .. nodes - 1] $ \nodeIndex -> do
+        myMailbox       <- newChan
+        pure ThreadContext { threadIndex   = nodeIndex
+                           , totalNodes    = nodes
+                           , totalTrips    = trips
+                           , mailbox       = myMailbox
+                           })
 
-node'' :: (?s :: Chan Int, ?d :: Chan Int) => IO ()
-node'' = do 
-  msg <- readChan ?s 
-  writeChan ?d msg 
-  node'' 
-
-
-node''' :: Chan Int -> Chan Int -> IO ()
-node''' s d = forever $ readChan s >>=writeChan d
-
-
-createRing :: Int -> IO (Chan Int, Chan Int)
-createRing n = do
-   chans :: V.Vector (Chan Int) <- V.generateM (n+1) $ const newChan
-
-   -- basic:
-   let node = node'
-
-   -- using forever:
-   -- let node = node'''
-    
-   -- using implicit parameters:
-   -- let node s d = let ?s = s  
-   --                    ?d = d in node''
-
-   forM_ [0..n-1] $ \i -> forkIO (node (chans ! i) (chans ! (i+1)))
-
-   return (V.head chans, V.last chans)
+spinUpThread :: ThreadContext -> Ring -> IO ThreadId
+spinUpThread ctx@ThreadContext{..} ring = forkIO loop
+  where
+      loop :: IO ()
+      loop = do
+          () <- readChan mailbox
+          sendMessage ring (neighbourIndex ctx)
+          loop
 
 
 createRingUnbuff :: Int -> IO (MVar Int, MVar Int)
