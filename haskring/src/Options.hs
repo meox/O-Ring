@@ -17,6 +17,7 @@ data Options = Options
       nodes           :: Int
     , trips           :: Int
     , version         :: Bool
+    , unbuffered      :: Bool 
     , args            :: [String]
     } deriving (Show)
 
@@ -27,6 +28,10 @@ parseOptions = do
             ( long "version"
            <> short 'V'
            <> help "Print version")
+    unbuffered <- switch
+            ( long "unbuffered"
+           <> short 'u'
+           <> help "Use unbuffered MVar")
     nodes <- option auto
             ( long "nodes"
            <> short 'p'

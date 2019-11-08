@@ -10,6 +10,8 @@ import qualified Paths_HaskRing as HR
 import Options
 import Options.Applicative
 import Control.Concurrent.Chan 
+import Control.Concurrent.MVar
+
 import Control.Monad (forever, forM_)
 import Control.Concurrent (forkIO)
 import Data.Version (showVersion)
@@ -19,6 +21,7 @@ import Data.Vector ((!))
 
 main :: IO ()
 main = updateOptions <$> execParser opts >>= \opt@Options{..} -> if | version   -> putStrLn $ showVersion HR.version 
+                                                                    | unbuffered -> mainRunUnbuff  opt
                                                                     | otherwise -> mainRun opt
     where opts = info (helper <*> parseOptions)
                       (fullDesc <> header "haskring!")
@@ -35,6 +38,20 @@ mainRun Options{..} = do
   let t1 :: Int = round (1000 * (tc `diffUTCTime` tb))
 
   putStrLn $ show t0 <> " " <> show t1 <> " " <> show nodes <> " " <> show trips
+
+mainRunUnbuff :: Options -> IO ()
+mainRunUnbuff Options{..} = do
+  ta <- getCurrentTime 
+  (s, e) <- createRingUnbuff nodes 
+  tb <- getCurrentTime
+  forM_ [1 .. trips] $ \i -> putMVar s i >> takeMVar e
+  tc <- getCurrentTime
+
+  let t0 :: Int = round (1000 * (tb `diffUTCTime` ta))
+  let t1 :: Int = round (1000 * (tc `diffUTCTime` tb))
+
+  putStrLn $ show t0 <> " " <> show t1 <> " " <> show nodes <> " " <> show trips
+
 
 node' :: Chan Int -> Chan Int -> IO ()
 node' s d = do 
@@ -71,6 +88,16 @@ createRing n = do
    forM_ [0..n-1] $ \i -> forkIO (node (chans ! i) (chans ! (i+1)))
 
    return (V.head chans, V.last chans)
+
+
+createRingUnbuff :: Int -> IO (MVar Int, MVar Int)
+createRingUnbuff n = do
+   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
+
+   forM_ [0..n-1] $ \i -> forkIO (forever $ takeMVar (chans ! i) >>= putMVar (chans ! (i+1)))
+
+   return (V.head chans, V.last chans)
+
 
 updateOptions :: Options -> Options
 updateOptions Options{..} =
