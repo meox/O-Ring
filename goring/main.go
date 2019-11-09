@@ -26,11 +26,11 @@ func main() {
 	}
 
 	t0 := time.Now()
-	s, e := createRing(n)
+	ring, e := createRing(n)
 	t1 := time.Now()
 
 	for i := 0; i < m; i++ {
-		s <- i
+		ring <- 0
 		_ = <-e
 	}
 
@@ -49,7 +49,7 @@ func createRing(n int) (chanT, chanT) {
 	node := func(src, dst chanT) {
 		for {
 			msg := <-src
-			dst <- msg
+			dst <- msg+1
 		}
 	}
 
