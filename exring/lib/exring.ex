@@ -15,9 +15,9 @@ defmodule ExRing do
 
   def run(_ring, 0), do: 0
   def run(ring, step) do
-    send(ring, step)
+    send(ring, 0)
     receive do
-      ^step -> run(ring, step - 1)
+      _ -> run(ring, step - 1)
     end
   end
 
@@ -49,7 +49,7 @@ defmodule ExRing do
   def process_node(dst) do
     receive do
       msg ->
-        send(dst, msg)
+        send(dst, msg+1)
     end
     process_node(dst)
   end
