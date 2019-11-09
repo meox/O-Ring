@@ -20,5 +20,6 @@ executable haskring
                        optparse-applicative,
                        time,
                        vector
-  ghc-options:         -O3 -Wall  -rtsopts -threaded "-with-rtsopts=-A200m -I0 -G1"
+
+  ghc-options:         -O2 -Wall  -rtsopts -threaded "-with-rtsopts=-A200m -I0 -G1"
 
