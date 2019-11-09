@@ -17,9 +17,8 @@ defmodule ExRing do
   def run(ring, step) do
     send(ring, step)
     receive do
-      msg -> msg
+      ^step -> run(ring, step - 1)
     end
-    run(ring, step - 1)
   end
 
   @spec create_ring(number) :: {number, pid}
