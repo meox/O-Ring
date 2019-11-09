@@ -37,7 +37,7 @@ neighbourIndex ThreadContext{..}
   | otherwise = succ threadIndex
 {-# INLINE neighbourIndex #-}
 
-sendMessage :: Ring a -> Int -> a -> IO ()
+sendMessage :: Num a => Ring a -> Int -> a -> IO ()
 sendMessage (Ring ring) threadIndex msg =
     writeChan (mailbox $ ring V.! threadIndex) msg
 {-# INLINE sendMessage #-}
@@ -78,6 +78,36 @@ mainRun opts@Options{..} = do
      else error "Ring failed."
 
 
+-- | Creates a new 'Ring' from some 'Options'.
+newRing :: Num a => Options -> IO (Ring a)
+newRing Options{..} = Ring . V.fromList <$> (
+    forM [0 .. nodes - 1] $ \nodeIndex -> do
+        myMailbox       <- newChan
+        pure ThreadContext { threadIndex   = nodeIndex
+                           , totalNodes    = nodes
+                           , totalTrips    = trips
+                           , mailbox       = myMailbox
+                           })
+
+spinUpThread :: Num a => ThreadContext a -> Ring a -> IO ThreadId
+spinUpThread ctx@ThreadContext{..} ring = forkIO loop
+  where
+      loop :: IO ()
+      loop = do
+          x <- readChan mailbox
+          sendMessage ring (neighbourIndex ctx) (x+1) 
+          loop
+
+
+createRingUnbuff :: Int -> IO (MVar Int, MVar Int)
+createRingUnbuff n = do
+   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
+
+   forM_ [0..n-1] $ \i -> forkIO (forever $ takeMVar (chans V.! i) >>= \x -> putMVar (chans V.! (i+1)) (x+1))
+
+   return (V.head chans, V.last chans)
+
+
 mainRunUnbuff :: Options -> IO ()
 mainRunUnbuff Options{..} = do
   ta <- getCurrentTime 
@@ -92,43 +122,9 @@ mainRunUnbuff Options{..} = do
   putStrLn $ show t0 <> " " <> show t1 <> " " <> show nodes <> " " <> show trips
 
 
-node' :: Chan Int -> Chan Int -> IO ()
-node' s d = do 
-  msg <- readChan s 
-  writeChan d msg 
-  node' s d
-
--- | Creates a new 'Ring' from some 'Options'.
-newRing :: Options -> IO (Ring a)
-newRing Options{..} = Ring . V.fromList <$> (
-    forM [0 .. nodes - 1] $ \nodeIndex -> do
-        myMailbox       <- newChan
-        pure ThreadContext { threadIndex   = nodeIndex
-                           , totalNodes    = nodes
-                           , totalTrips    = trips
-                           , mailbox       = myMailbox
-                           })
-
-spinUpThread :: ThreadContext a -> Ring a -> IO ThreadId
-spinUpThread ctx@ThreadContext{..} ring = forkIO loop
-  where
-      loop :: IO ()
-      loop = do
-          msg <- readChan mailbox
-          sendMessage ring (neighbourIndex ctx) msg
-          loop
-
-createRingUnbuff :: Int -> IO (MVar Int, MVar Int)
-createRingUnbuff n = do
-   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
-
-   forM_ [0..n-1] $ \i -> forkIO (forever $ takeMVar (chans V.! i) >>= putMVar (chans V.! (i+1)))
-
-   return (V.head chans, V.last chans)
-
-
 updateOptions :: Options -> Options
 updateOptions Options{..} =
   case args of
     [numberOfNodes, numberOfTrips] -> Options { nodes=read numberOfNodes, trips= read numberOfTrips, ..}
     _ -> Options{..}
+
