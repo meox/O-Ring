@@ -8,3 +8,5 @@ haskring/.ghc.environment*
 haskring/dist-newstyle
 
 ring
+
+ponyring/main
