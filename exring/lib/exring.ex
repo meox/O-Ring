@@ -25,12 +25,7 @@ defmodule ExRing do
   @spec create_ring(number) :: {number, pid}
   def create_ring(n) do
     t0 = Time.utc_now()
-
-    ring =
-      self()
-      |> node_spawn()
-      |> chain(n - 1)
-
+    ring = chain(self(), n)
     t1 = Time.utc_now()
     {Time.diff(t1, t0, :millisecond), ring}
   end
@@ -47,12 +42,12 @@ defmodule ExRing do
   end
 
   defp node_spawn(dst) do
-    spawn(fn -> process_node(dst) end)
+    spawn(__MODULE__, :process_node, [dst])
   end
 
   # process node function:
   # take a message and send it to destination node
-  defp process_node(dst) do
+  def process_node(dst) do
     receive do
       msg ->
         send(dst, msg)
