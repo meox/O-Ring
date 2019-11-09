@@ -13,32 +13,46 @@ actor Ring
   be set(neighbor: Ring) =>
     _next = neighbor
 
-  be pass(i: USize) =>
+  be pass(main: Main, i: U32) =>
     if i > 0 then
       match _next
       | let n: Ring =>
-        n.pass(i - 1)
+        n.pass(main, i - 1)
       end
     else
-      _env.out.print(_id.string())
+      main.complete()
     end
 
 actor Main
   var _ring_size: U32 = 3
-  var _ring_count: U32 = 1
-  var _trip: USize = 10
+  var _trip: U32 = 10
 
   var _env: Env
+  var _ring: Ring
 
   new create(env: Env) =>
     _env = env
+    _ring = Ring(0, _env)
 
     try
       parse_args()?
-      setup_ring()
+      _ring = setup_ring()
+      _trip = _trip - 1
+      _ring.pass(this, _ring_size)
     else
       usage()
     end
+
+  be complete() =>
+    if _trip > 0 then
+      _trip = _trip - 1
+      _ring.pass(this, _ring_size)
+    else
+      finish()
+    end
+
+  be finish() =>
+    _env.out.print("finish")
 
   fun ref parse_args() ? =>
     var i: USize = 1
@@ -53,13 +67,13 @@ actor Main
       | "--size" =>
         _ring_size = value.u32()?
       | "--trip" =>
-        _trip = value.usize()?
+        _trip = value.u32()?
       else
         error
       end
     end
 
-  fun setup_ring() =>
+  fun setup_ring(): Ring =>
     let first = Ring(1, _env)
     var next = first
 
@@ -69,10 +83,7 @@ actor Main
     end
 
     first.set(next)
-
-    if _trip > 0 then
-      first.pass(_trip)
-    end
+    first
 
   fun usage() =>
     _env.out.print(
