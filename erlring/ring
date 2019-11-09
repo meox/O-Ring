@@ -3,4 +3,5 @@
 N=$1
 M=$2
 
-erl +P 3000000 -noshell -s ring main $N $M -s init stop
+erl -noshell -s ring main $N $M -s init stop
+
