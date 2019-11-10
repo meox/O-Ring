@@ -16,6 +16,7 @@ import Control.Concurrent
 import Data.Version (showVersion)
 import Data.Time.Clock 
 import qualified Data.Vector as V
+import Data.Vector ((!)) 
 
 main :: IO ()
 main = updateOptions <$> execParser opts >>= \opt@Options{..} -> if | version   -> putStrLn $ showVersion HR.version 
@@ -34,12 +35,12 @@ mainRun Options{..} = do
       then do
         (s, e) <- mkRingUnbuff nodes 
         tb <- getCurrentTime
-        total <- sum <$> (forM [1 .. trips] $ \_ -> putMVar s 0 >> takeMVar e)
+        total <- V.sum <$> (V.forM (V.generate trips (+1)) $ \_ -> putMVar s 0 >> takeMVar e)
         return (tb, total)
       else do
         (s, e) <- mkRing nodes 
         tb <- getCurrentTime
-        total <- sum <$> (forM [1 .. trips] $ \_ -> writeChan s 0 >> readChan e)
+        total <- V.sum <$> (V.forM (V.generate trips (+1)) $ \_ -> writeChan s 0 >> readChan e)
         return (tb, total)
 
   t''' <- getCurrentTime 
@@ -56,7 +57,7 @@ mkRing :: Int -> IO (Chan Int, Chan Int)
 mkRing n = do
   cap <- getNumCapabilities 
   chans :: V.Vector (Chan Int) <- V.generateM (n+1) $ const newChan
-  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ readChan (chans V.! i) >>= \x -> writeChan (chans V.! (i+1)) (x+1))
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ readChan (chans ! i) >>= \x -> writeChan (chans ! (i+1)) (x+1))
   return (V.head chans, V.last chans)
 
 
@@ -64,7 +65,7 @@ mkRingUnbuff :: Int -> IO (MVar Int, MVar Int)
 mkRingUnbuff n = do
   cap <- getNumCapabilities 
   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
-  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ takeMVar (chans V.! i) >>= \x -> putMVar (chans V.! (i+1)) (x+1))
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ takeMVar (chans ! i) >>= \x -> putMVar (chans ! (i+1)) (x+1))
   return (V.head chans, V.last chans)
 
 
