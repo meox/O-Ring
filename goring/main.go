@@ -29,9 +29,15 @@ func main() {
 	ring, e := createRing(n)
 	t1 := time.Now()
 
+	var total int
 	for i := 0; i < m; i++ {
 		ring <- 0
-		_ = <-e
+		total += <-e
+	}
+
+	if total != (n * m) {
+		fmt.Printf("Ring failed!\n")
+		os.Exit(1)
 	}
 
 	fmt.Printf(
@@ -48,8 +54,8 @@ func createRing(n int) (chanT, chanT) {
 
 	node := func(src, dst chanT) {
 		for {
-			msg := <-src
-			dst <- msg+1
+			x := <-src
+			dst <- x + 1
 		}
 	}
 
