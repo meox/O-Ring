@@ -62,7 +62,7 @@ func createRing(n int) (chanT, chanT) {
 	src := startChannel
 	var dst chanT
 	for i := 0; i < n; i++ {
-		dst = make(chanT)
+		dst = make(chanT, 1)
 		go node(src, dst)
 		src = dst
 	}
