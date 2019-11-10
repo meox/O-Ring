@@ -66,20 +66,6 @@ mkRingUnbuff n = do
    return (V.head chans, V.last chans)
 
 
-mainRunUnbuff :: Options -> IO ()
-mainRunUnbuff Options{..} = do
-  ta <- getCurrentTime 
-  (s, e) <- createRingUnbuff nodes 
-  tb <- getCurrentTime
-  forM_ [1 .. trips] $ \i -> putMVar s i >> takeMVar e
-  tc <- getCurrentTime
-
-  let t0 :: Int = round (1000 * (tb `diffUTCTime` ta))
-  let t1 :: Int = round (1000 * (tc `diffUTCTime` tb))
-
-  putStrLn $ show t0 <> " " <> show t1 <> " " <> show nodes <> " " <> show trips
-
-
 updateOptions :: Options -> Options
 updateOptions Options{..} =
   case args of
