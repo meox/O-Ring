@@ -57,7 +57,11 @@ mkRing :: Int -> IO (Chan Int, Chan Int)
 mkRing n = do
   cap <- getNumCapabilities 
   chans :: V.Vector (Chan Int) <- V.generateM (n+1) $ const newChan
-  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ readChan (chans ! i) >>= \x -> writeChan (chans ! (i+1)) (x+1))
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) $ do
+    let r = chans ! i
+        w = chans ! (i+1)
+    forever $ readChan r >>= \x -> writeChan w (x+1)
+
   return (V.head chans, V.last chans)
 
 
@@ -65,7 +69,10 @@ mkRingUnbuff :: Int -> IO (MVar Int, MVar Int)
 mkRingUnbuff n = do
   cap <- getNumCapabilities 
   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
-  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ takeMVar (chans ! i) >>= \x -> putMVar (chans ! (i+1)) (x+1))
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (do
+    let r = chans ! i
+        w = chans ! (i+1)
+    forever $ takeMVar r >>= \x -> putMVar w (x+1))
   return (V.head chans, V.last chans)
 
 
