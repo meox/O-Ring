@@ -21,5 +21,5 @@ executable haskring
                        time,
                        vector
 
-  ghc-options:         -O2 -Wall  -rtsopts -threaded "-with-rtsopts=-A200m -I0 -G1"
+  ghc-options:         -O2 -Wall  -rtsopts -threaded "-with-rtsopts=-A32m -qm -qn2 -N"
 

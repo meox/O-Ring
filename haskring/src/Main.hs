@@ -54,16 +54,18 @@ mainRun Options{..} = do
 
 mkRing :: Int -> IO (Chan Int, Chan Int)
 mkRing n = do
-   chans :: V.Vector (Chan Int) <- V.generateM (n+1) $ const newChan
-   forM_ [0..n-1] $ \i -> forkIO (forever $ readChan (chans V.! i) >>= \x -> writeChan (chans V.! (i+1)) (x+1))
-   return (V.head chans, V.last chans)
+  cap <- getNumCapabilities 
+  chans :: V.Vector (Chan Int) <- V.generateM (n+1) $ const newChan
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ readChan (chans V.! i) >>= \x -> writeChan (chans V.! (i+1)) (x+1))
+  return (V.head chans, V.last chans)
 
 
 mkRingUnbuff :: Int -> IO (MVar Int, MVar Int)
 mkRingUnbuff n = do
-   chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
-   forM_ [0..n-1] $ \i -> forkIO (forever $ takeMVar (chans V.! i) >>= \x -> putMVar (chans V.! (i+1)) (x+1))
-   return (V.head chans, V.last chans)
+  cap <- getNumCapabilities 
+  chans :: V.Vector (MVar Int) <- V.generateM (n+1) $ const newEmptyMVar
+  forM_ [0..n-1] $ \i -> forkOn (n `div` cap) (forever $ takeMVar (chans V.! i) >>= \x -> putMVar (chans V.! (i+1)) (x+1))
+  return (V.head chans, V.last chans)
 
 
 updateOptions :: Options -> Options
