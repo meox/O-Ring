@@ -1,4 +1,5 @@
 use "collections"
+use "time"
 
 actor Ring
   let _id: U32
@@ -26,9 +27,13 @@ actor Ring
 actor Main
   var _ring_size: U32 = 3
   var _trip: U32 = 10
+  var _orig_trip: U32 = 10
 
   var _env: Env
   var _ring: Ring
+
+  var _time_ring: U64 = 0
+  var _time_trip: U64 = 0
 
   new create(env: Env) =>
     _env = env
@@ -36,7 +41,14 @@ actor Main
 
     try
       parse_args()?
+      _orig_trip = _trip
+
+      var t0: U64 = Time.millis()
       _ring = setup_ring()
+      var t1: U64 = Time.millis()
+      _time_ring = t1 - t0
+
+      _time_trip = Time.millis()
       _trip = _trip - 1
       _ring.pass(this, _ring_size)
     else
@@ -52,26 +64,12 @@ actor Main
     end
 
   be finish() =>
-    _env.out.print("finish")
+    _time_trip = Time.millis() - _time_trip
+    _env.out.print(_time_ring.string() + " " + _time_trip.string() + " " + _ring_size.string() + " " + _orig_trip.string())
 
   fun ref parse_args() ? =>
-    var i: USize = 1
-
-    while i < _env.args.size() do
-      // Every option has an argument.
-      var option = _env.args(i)?
-      var value = _env.args(i + 1)?
-      i = i + 2
-
-      match option
-      | "--size" =>
-        _ring_size = value.u32()?
-      | "--trip" =>
-        _trip = value.u32()?
-      else
-        error
-      end
-    end
+    _ring_size = _env.args(1)?.u32()?
+    _trip = _env.args(2)?.u32()?
 
   fun setup_ring(): Ring =>
     let first = Ring(1, _env)
@@ -88,8 +86,8 @@ actor Main
   fun usage() =>
     _env.out.print(
       """
-      ring OPTIONS
-        --size N number of actors in each ring
-        --trip N number of messages to pass around each ring
+      ring N M
+        N number of actors in each ring
+        M number of messages to pass around each ring
       """
       )
