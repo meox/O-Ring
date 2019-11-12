@@ -108,6 +108,15 @@ make all
 
 ## Scala
 
+## Rust
+
+* Run
+
+```sh
+cd rustring
+cargo run --release  -- 200000 30
+```  
+
 ## Benchmark
 
 ## Authors
