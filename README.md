@@ -118,10 +118,3 @@ cargo run --release  -- 200000 30
 ```  
 
 ## Benchmark
-
-## Authors
-
-- Federico Bertolucci
-- Gian Lorenzo Meocci (`glmeocci @ gmail.com`)
-- Nicola Bonelli (`nicola.bonelli @ gmail.com`)
-- Alfredo Di Napoli
