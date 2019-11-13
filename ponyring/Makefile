@@ -1,5 +1,5 @@
 all:
-	docker run -v `pwd`:/src/main ponylang/ponyc
+	docker run -v `pwd`:/src/main ponylang/ponyc:0.33.0
 	mv main ring
 
 clean:
