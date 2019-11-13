@@ -5,4 +5,5 @@ clean:
 	stack clean
 	rm -f ring
 
-.PHOENY: all
+.PHONY: all
+
