@@ -3,7 +3,8 @@ defmodule ExRing.CLI do
     ExRing.start(
       String.to_integer(n),
       String.to_integer(m)
-    ) |> print_times(n, m, :millisecond)
+    )
+    |> print_times(n, m, :millisecond)
   end
 
   def main(_args) do
@@ -15,7 +16,7 @@ defmodule ExRing.CLI do
   end
 
   def to_ms_string(time_micro) do
-    time_micro/1_000
+    (time_micro / 1_000)
     |> Float.round()
     |> :erlang.float_to_binary(decimals: 0)
   end
