@@ -10,8 +10,10 @@ defmodule ExRing do
   end
 
   def run(_ring, 0), do: 0
+
   def run(ring, step) do
     send(ring, 0)
+
     receive do
       _ -> run(ring, step - 1)
     end
@@ -20,11 +22,11 @@ defmodule ExRing do
   @spec create_ring(number) :: pid
   def create_ring(n), do: chain(self(), n)
 
-
-  #******************* HELPERS *******************
+  # ******************* HELPERS *******************
 
   @spec chain(pid, number) :: pid
   defp chain(parent, 0), do: parent
+
   defp chain(parent, n) do
     parent
     |> node_spawn()
@@ -40,8 +42,9 @@ defmodule ExRing do
   def process_node(dst) do
     receive do
       msg ->
-        send(dst, msg+1)
+        send(dst, msg + 1)
     end
+
     process_node(dst)
   end
 end
