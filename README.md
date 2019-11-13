@@ -118,3 +118,16 @@ cargo run --release  -- 200000 30
 ```  
 
 ## Benchmark
+
+* Build
+
+```sh
+cd benchmark
+make
+```
+
+* Run
+
+```sh
+./benchmark 10 100:300:100 1000:3000:1000
+```
