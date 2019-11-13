@@ -3,5 +3,5 @@ all:
 clean:
 	rm ring
 
-.PHOENY: all
+.PHONY: all
 

@@ -3,7 +3,7 @@ all:
 	mv main ring
 
 clean:
-	rm ring
+	rm -f ring
 
-.PHOENY: all
+.PHONY: all
 
