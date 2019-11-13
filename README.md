@@ -109,10 +109,3 @@ make all
 ## Scala
 
 ## Benchmark
-
-## Authors
-
-- Federico Bertolucci
-- Gian Lorenzo Meocci (`glmeocci @ gmail.com`)
-- Nicola Bonelli (`nicola.bonelli @ gmail.com`)
-- Alfredo Di Napoli
