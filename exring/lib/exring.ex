@@ -3,7 +3,8 @@ defmodule ExRing do
   Elixir implementation of Ring Exercise
   """
 
-  def start(n, m) do
+  @spec start({integer(), integer()}) :: {integer, integer}
+  def start({n, m}) do
     {creation_time, ring} = :timer.tc(__MODULE__, :create_ring, [n])
     {run_time, 0} = :timer.tc(__MODULE__, :run, [ring, m])
     {creation_time, run_time}
@@ -33,6 +34,7 @@ defmodule ExRing do
     |> chain(n - 1)
   end
 
+  @spec node_spawn(pid) :: pid
   defp node_spawn(dst) do
     spawn(__MODULE__, :process_node, [dst])
   end
