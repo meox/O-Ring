@@ -16,7 +16,7 @@ on the Internet!
 ```
 
 ## Guidelines
-To partecipate to the benchmark, you must adopt on the following guidelines:
+To participate to the benchmark, you must adopt on the following guidelines:
   *  every implementation shall expose an executable file (bash script or program) named `ring`
   *  every implementation shall agree on the following API when `ring` is invoked: `./ring NumberOfNodes NumberOfTrips` where:
      -  `NumberOfNodes`: the number of processes/threads/nodes in the ring, `N` in the description above
