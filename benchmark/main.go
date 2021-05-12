@@ -37,6 +37,7 @@ func main() {
 		"elixir":   "../exring/",
 		"haskell":  "../haskring",
 		"ponylang": "../ponyring",
+		"rust":     "../rustring",
 	}
 
 	for language, path := range languages {
