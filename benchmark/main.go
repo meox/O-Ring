@@ -31,6 +31,7 @@ func main() {
 	tripsSteps := calculateSteps(tripsRange)
 
 	var languages = map[string]string{
+		"cpp":      "../cppring/",
 		"go":       "../goring/",
 		"erlang":   "../erlring/",
 		"elixir":   "../exring/",
